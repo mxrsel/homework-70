@@ -52,6 +52,18 @@ export const addContact = createAsyncThunk<void, Contact, {state: RootState}>(
     }
 );
 
+interface updateContactArg {
+    id: string;
+    Contact: Contact
+}
+
+export const updateContact = createAsyncThunk<void, updateContactArg, {state: RootState}>(
+    'contacts/updateContact',
+    async ({ id, Contact }) => {
+        await axiosApi.put(`/contacts/${id}.json`, Contact);
+    }
+);
+
 
 const contactSlice = createSlice({
     name: "contact",
@@ -83,5 +95,16 @@ const contactSlice = createSlice({
                     state.loading = false;
                 })
             builder
+                .addCase(updateContact.pending, (state) => {
+                    state.loading = true;
+                })
+                .addCase(updateContact.fulfilled, (state) => {
+                    state.loading = false;
+                })
+                .addCase(updateContact.rejected, (state) => {
+                    state.loading = false;
+                })
     }
-})
+});
+
+export const  contactReducer = contactSlice.reducer;
