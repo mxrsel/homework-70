@@ -1,5 +1,5 @@
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {AppDispatch} from "../app/store.ts";
+import {AppDispatch, RootState} from "../app/store.ts";
 import axiosApi from "../axiosApi.ts";
 
 interface Contact{
@@ -41,6 +41,10 @@ export const fetchContacts = createAsyncThunk<Contact[], undefined, {dispatch: A
 return newContacts;
 });
 
+export const deleteContact = createAsyncThunk<void, string, {state: RootState}>('/contacts/deleteContact', async (id) => {
+    await axiosApi.delete(`/contacts/${id}.json`);
+});
+
 const contactSlice = createSlice({
     name: "contact",
     initialState,
@@ -56,6 +60,9 @@ const contactSlice = createSlice({
             })
             .addCase(fetchContacts.rejected, (state) => {
                 state.loading = false;
-            });
+            })
+            .addCase(deleteContact.fulfilled, (state) => {
+                state.loading = false;
+            })
     }
 })
