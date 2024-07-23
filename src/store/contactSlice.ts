@@ -45,6 +45,14 @@ export const deleteContact = createAsyncThunk<void, string, {state: RootState}>(
     await axiosApi.delete(`/contacts/${id}.json`);
 });
 
+export const addContact = createAsyncThunk<void, Contact, {state: RootState}>(
+    'contacts/addContact',
+    async (contact) => {
+        await axiosApi.post('/contacts.json', contact);
+    }
+);
+
+
 const contactSlice = createSlice({
     name: "contact",
     initialState,
@@ -64,5 +72,16 @@ const contactSlice = createSlice({
             .addCase(deleteContact.fulfilled, (state) => {
                 state.loading = false;
             })
+            builder
+            .addCase(addContact.pending, (state) => {
+                state.loading = true;
+            })
+                .addCase(addContact.fulfilled, (state) => {
+                    state.loading = false;
+                })
+                .addCase(addContact.rejected, (state) => {
+                    state.loading = false;
+                })
+            builder
     }
 })
