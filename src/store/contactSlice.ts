@@ -1,68 +1,26 @@
-import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-import {AppDispatch, RootState} from "../app/store.ts";
-import axiosApi from "../axiosApi.ts";
+import {createSlice} from "@reduxjs/toolkit";
+import {addContact, deleteContact, fetchContacts, updateContact} from "./contactThunks.ts";
+import {Contact} from "../types.ts";
 
-interface Contact{
-    id: string;
-    name: string;
-    phone: string;
-    email: string;
-    image: string;
-}
+
 
 export interface ContactState {
     contacts: Contact[];
-    loading: boolean;
-    error: string | null
+    fetchLoading: boolean;
+    deleteLoading: boolean;
+    addLoading: boolean;
+    updateLoading: boolean;
 }
 
 const initialState: ContactState = {
     contacts: [],
-    loading: false,
-    error: null,
+    fetchLoading: false,
+    deleteLoading: false,
+    addLoading: false,
+    updateLoading: false,
 };
 
-export const fetchContacts = createAsyncThunk<Contact[], undefined, {dispatch: AppDispatch}> ('contacts/fetchContacts', async () => {
-    const contactsResponse = await axiosApi.get('/contacts.json');
-    const contacts = contactsResponse.data;
 
-    let newContacts: Contact[] = [];
-
-    if(contacts) {
-        newContacts = Object.keys(contacts).map((key: string) => {
-            const contact = contacts[key];
-            return {
-                id: key,
-                ...contact,
-            };
-        });
-    }
-
-return newContacts;
-});
-
-export const deleteContact = createAsyncThunk<void, string, {state: RootState}>('/contacts/deleteContact', async (id) => {
-    await axiosApi.delete(`/contacts/${id}.json`);
-});
-
-export const addContact = createAsyncThunk<void, Contact, {state: RootState}>(
-    'contacts/addContact',
-    async (contact) => {
-        await axiosApi.post('/contacts.json', contact);
-    }
-);
-
-interface updateContactArg {
-    id: string;
-    Contact: Contact
-}
-
-export const updateContact = createAsyncThunk<void, updateContactArg, {state: RootState}>(
-    'contacts/updateContact',
-    async ({ id, Contact }) => {
-        await axiosApi.put(`/contacts/${id}.json`, Contact);
-    }
-);
 
 
 const contactSlice = createSlice({
@@ -72,39 +30,60 @@ const contactSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(fetchContacts.pending, (state) => {
-                state.loading = true;
+                state.fetchLoading = true;
             })
             .addCase(fetchContacts.fulfilled, (state, {payload: contacts}) => {
-                state.loading = false;
+                state.fetchLoading = false;
                 state.contacts = contacts;
             })
             .addCase(fetchContacts.rejected, (state) => {
-                state.loading = false;
+                state.fetchLoading = false;
+            })
+            .addCase(deleteContact.pending, (state) => {
+                state.deleteLoading = true;
             })
             .addCase(deleteContact.fulfilled, (state) => {
-                state.loading = false;
+                state.deleteLoading = false;
+            })
+            .addCase(deleteContact.rejected, (state) => {
+                state.deleteLoading = false;
             })
             builder
             .addCase(addContact.pending, (state) => {
-                state.loading = true;
+                state.addLoading = true;
             })
                 .addCase(addContact.fulfilled, (state) => {
-                    state.loading = false;
+                    state.addLoading = false;
                 })
                 .addCase(addContact.rejected, (state) => {
-                    state.loading = false;
+                    state.addLoading = false;
                 })
             builder
                 .addCase(updateContact.pending, (state) => {
-                    state.loading = true;
+                    state.updateLoading= true;
                 })
                 .addCase(updateContact.fulfilled, (state) => {
-                    state.loading = false;
+                    state.updateLoading = false;
                 })
                 .addCase(updateContact.rejected, (state) => {
-                    state.loading = false;
+                    state.updateLoading = false;
                 })
-    }
+    },
+    selectors: {
+        selectContacts: (state) => state.contacts,
+        selectFetchContactsLoading: (state) => state.fetchLoading,
+        selectDeleteContactLoading: (state) => state.deleteLoading,
+        selectAddContactLoading: (state) => state.addLoading,
+        selectUpdateContactLoading: (state) => state.updateLoading,
+    },
 });
 
 export const  contactReducer = contactSlice.reducer;
+
+export const {
+    selectContacts,
+    selectFetchContactsLoading,
+    selectDeleteContactLoading,
+    selectAddContactLoading,
+    selectUpdateContactLoading,
+} = contactSlice.selectors;
