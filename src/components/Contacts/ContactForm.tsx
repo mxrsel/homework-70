@@ -1,6 +1,31 @@
-import React from 'react';
+import React, {useState} from 'react';
+import {Contact, ContactMutation} from "../../types.ts";
 
-const ContactForm: React.FC= () => {
+interface Props {
+    onSubmit: (contact: Contact) => void;
+    existingContact?: Contact;
+    isLoading?: boolean;
+}
+
+const emptyState: ContactMutation = {
+    id: '',
+    name: '',
+    phone: '',
+    email: '',
+    image: '',
+}
+
+const ContactForm: React.FC<Props> = ({
+    onSubmit,
+    existingContact,
+    isLoading = false
+}) => {
+    const initialState: ContactMutation = existingContact
+    ? {...existingContact, phone: existingContact.phone.toString() }
+        :emptyState
+
+const [contactData, setContactData] = useState<Contact>(initialState)
+
     return (
         <div>
             <form>
