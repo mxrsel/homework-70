@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {ChangeEvent, useState} from 'react';
 import {Contact, ContactMutation} from "../../types.ts";
 
 interface Props {
@@ -24,7 +24,18 @@ const ContactForm: React.FC<Props> = ({
     ? {...existingContact, phone: existingContact.phone.toString() }
         :emptyState
 
-const [contactData, setContactData] = useState<Contact>(initialState)
+const [contactData, setContactData] = useState<Contact>(initialState);
+
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const {name, value} = e.target;
+        setContactData((prev) => ({...prev, [name]: value}));
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        onSubmit(contactData);
+    };
 
     return (
         <div>
