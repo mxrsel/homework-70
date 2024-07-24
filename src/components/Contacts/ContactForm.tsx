@@ -39,13 +39,15 @@ const [contactData, setContactData] = useState<Contact>(initialState);
 
     return (
         <div>
-            <form>
+            <form onSubmit={handleSubmit}>
                 <div>
                     <label>
                         Name:
                         <input
                             type="text"
                             name="name"
+                            value={contactData.name}
+                            onChange={handleChange}
                             required
                         />
                     </label>
@@ -56,6 +58,8 @@ const [contactData, setContactData] = useState<Contact>(initialState);
                         <input
                             type="text"
                             name="number"
+                            value={contactData.phone}
+                            onChange={handleChange}
                             required
                         />
                     </label>
@@ -66,7 +70,10 @@ const [contactData, setContactData] = useState<Contact>(initialState);
                         <input
                             type="email"
                             name="email"
-                            required/>
+                            value={contactData.email}
+                            onChange={handleChange}
+                            required
+                        />
                     </label>
                 </div>
                 <div>
@@ -75,9 +82,21 @@ const [contactData, setContactData] = useState<Contact>(initialState);
                         <input
                             type="url"
                             name="image"
+                            value={contactData.image}
+                            onChange={handleChange}
                             required
                         />
                     </label>
+                </div>
+                {contactData.image && (
+                    <div>
+                        <img src={contactData.image} alt='preview' />
+                    </div>
+                )}
+                <div>
+                    <button type='submit' disabled={isLoading}>
+                        {existingContact ? 'Update' : 'Create'}
+                    </button>
                 </div>
             </form>
         </div>
